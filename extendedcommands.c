@@ -360,8 +360,9 @@ void show_mount_usb_storage_menu()
         return -1;
     }
     static char* headers[] = {  "USB Mass Storage device",
-                                "Leaving this menu unmount",
-                                "your SD card from your PC.",
+                                "Leaving this menu will unmount",
+                                "safely remove your SD card from your PC.",
+				"before leaving this menu",
                                 "",
                                 NULL
     };
@@ -396,20 +397,11 @@ int confirm_selection(const char* title, const char* confirm)
 
     char* confirm_headers[]  = {  title, "  THIS CAN NOT BE UNDONE.", "", NULL };
     char* items[] = { "No",
-                      "No",
-                      "No",
-                      "No",
-                      "No",
-                      "No",
-                      "No",
-                      confirm, //" Yes -- wipe partition",   // [7
-                      "No",
-                      "No",
-                      "No",
+                      confirm, //" Yes -- wipe partition",   // [1]
                       NULL };
 
     int chosen_item = get_menu_selection(confirm_headers, items, 0, 0);
-    return chosen_item == 7;
+    return chosen_item == 1;
 }
 
 #define MKE2FS_BIN      "/sbin/mke2fs"
