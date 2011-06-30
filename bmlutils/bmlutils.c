@@ -63,12 +63,12 @@ int cmd_bml_restore_raw_partition(const char *partition, const char *filename)
 
     // always restore boot, regardless of whether recovery or boot is flashed.
     // this is because boot and recovery are the same on some samsung phones.
-    int ret = restore_internal("/dev/block/bml7", filename);
+    int ret = restore_internal("/dev/block/bml8", filename);
     if (ret != 0)
         return ret;
 
     if (strcmp(partition, "recovery") == 0)
-        ret = restore_internal("/dev/block/bml8", filename);
+        ret = restore_internal("/dev/block/bml9", filename);
     return ret;
 }
 
@@ -76,9 +76,9 @@ int cmd_bml_backup_raw_partition(const char *partition, const char *out_file)
 {
     char* bml;
     if (strcmp("boot", partition) == 0)
-        bml = "/dev/block/bml7";
-    else if (strcmp("recovery", partition) == 0)
         bml = "/dev/block/bml8";
+    else if (strcmp("recovery", partition) == 0)
+        bml = "/dev/block/bml9";
     else {
         printf("Invalid partition.\n");
         return -1;
