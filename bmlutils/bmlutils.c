@@ -173,8 +173,15 @@ int cmd_bml_get_partition_device(const char *partition, char *device)
 }
 
 int format_rfs_device (const char *device, const char *path) {
+
+// Custom edit for the Attain 4G SCH-R920 for following formatting:
+// rfs16	"/sbin/fat.format -F 16 -s 1 -S 4096"	dbdata fota preinstall
+// rfs32	"/sbin/fat.format -F 32 -s 4 -S 4096"	data
+// rfs16_8	"/sbin/fat.format -F 16 -s 16 -S 512"	cache
+
     const char *fatsize = "32";
     const char *sectorsize = "1";
+    const char *blocksize = "4096";
 
     if (strcmp(path, "/datadata") == 0 || strcmp(path, "/cache") == 0) {
         fatsize = "16";
@@ -182,10 +189,15 @@ int format_rfs_device (const char *device, const char *path) {
 
     // Just in case /data sector size needs to be altered
     else if (strcmp(path, "/data") == 0 ) {
-        sectorsize = "1";
+        sectorsize = "4";
     } 
 
-    // dump 10KB of zeros to partition before format due to fat.format bug
+    if (strcmp(path, "/cache") == 0) {
+        sectorsize = "16";
+        blocksize = "512";
+    }
+  
+// dump 10KB of zeros to partition before format due to fat.format bug
     char cmd[PATH_MAX];
 
     sprintf(cmd, "/sbin/dd if=/dev/zero of=%s bs=4096 count=10", device);
@@ -195,7 +207,7 @@ int format_rfs_device (const char *device, const char *path) {
     }
 
     // Run fat.format
-    sprintf(cmd, "/sbin/fat.format -F %s -S 4096 -s %s %s", fatsize, sectorsize, device);
+    sprintf(cmd, "/sbin/fat.format -F %s -S %s -s %s %s", fatsize, blocksize, sectorsize, device);
     if(__system(cmd)) {
         printf("failure while running fat.format\n");
         return -1;
